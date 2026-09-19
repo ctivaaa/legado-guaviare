@@ -43,6 +43,18 @@ export class EraTracker {
   private pendingIndex: number | null = null;
   private pendingTimer = 0;
 
+  /**
+   * La pista registrada, o —si el DOM se recreó (recarga en caliente en
+   * desarrollo) y el elemento guardado ya no está en la página— la que haya
+   * ahora. Sin esto el contador de épocas se queda congelado en la primera.
+   */
+  private runway(): HTMLElement | null {
+    if (this.runwayEl && !this.runwayEl.isConnected) {
+      this.runwayEl = document.querySelector<HTMLElement>('.journey-runway');
+    }
+    return this.runwayEl;
+  }
+
   /** Se llama una sola vez, desde `app-era-journey`, con su pista de scroll. */
   registerJourney(runwayElement: HTMLElement, layers: readonly JourneyEra[]): void {
     this.runwayEl = runwayElement;
@@ -75,13 +87,14 @@ export class EraTracker {
   }
 
   private scrollToIndex(i: number): void {
-    if (!this.runwayEl || i < 0 || i >= this.layersList.length) return;
-    const total = this.runwayEl.offsetHeight - window.innerHeight;
+    const runway = this.runway();
+    if (!runway || i < 0 || i >= this.layersList.length) return;
+    const total = runway.offsetHeight - window.innerHeight;
     // El prólogo es el comienzo de la página: arriba del todo, no "un poco adentro".
     const targetP = i === 0 ? 0 : Math.min(i / this.layersList.length + JOURNEY_FADE + 0.02, 1);
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({
-      top: this.runwayEl.offsetTop + targetP * total,
+      top: runway.offsetTop + targetP * total,
       behavior: reduced ? 'auto' : 'smooth',
     });
   }
@@ -96,13 +109,14 @@ export class EraTracker {
   }
 
   private update(): void {
-    if (!this.runwayEl) return;
+    const runway = this.runway();
+    if (!runway) return;
     const layers = this.layersList;
     const n = layers.length;
     if (!n) return;
 
-    const offsetTop = this.runwayEl.offsetTop;
-    const total = this.runwayEl.offsetHeight - window.innerHeight;
+    const offsetTop = runway.offsetTop;
+    const total = runway.offsetHeight - window.innerHeight;
     const p = total > 0 ? Math.min(Math.max((window.scrollY - offsetTop) / total, 0), 1) : 0;
 
     const idxF = p * n;

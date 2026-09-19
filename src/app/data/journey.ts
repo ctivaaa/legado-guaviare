@@ -34,7 +34,7 @@ export const HERO_LAYER: JourneyEra = {
   quote:
     'La historia de mi familia en el Guaviare, contada hacia atrás: empezamos por lo que somos hoy y bajamos, generación por generación, hasta la raíz de todo.',
   credit: '',
-  image: 'assets/mascara-fajos.jpeg',
+  image: 'assets/mascara-fajos.webp',
   video: 'assets/abuelomejorado.mp4',
   accent: '#C98B52',
   accent2: '#1a120a',
@@ -56,7 +56,7 @@ export const JOURNEY_ERAS: readonly JourneyEra[] = [
     title: '',
     quote: '',
     credit: '',
-    image: 'assets/mascara-fajos.jpeg',
+    image: 'assets/mascara-fajos.webp',
     video: 'assets/MascaraMonedas.mp4',
     accent: '#8C6A2E',
     accent2: '#5C4A1E',
@@ -72,7 +72,7 @@ export const JOURNEY_ERAS: readonly JourneyEra[] = [
     credit: 'Tío Jhon',
     // Poster = primer fotograma del propio video (no la ilustración del bus
     // quemándose, que se alcanzaba a ver en el scroll mientras cargaba el video).
-    image: 'assets/poster-flota.jpg',
+    image: 'assets/poster-flota.webp',
     video: 'assets/videoCarro.mp4',
     // blood-bright — único uso en toda la paleta de "la quemaron" (alimenta
     // el punto de polvo ambiental y el indicador de nav de esta época).
@@ -88,7 +88,7 @@ export const JOURNEY_ERAS: readonly JourneyEra[] = [
     title: 'Las avionetas pasaron. Los muertos pasaron. La hoja se quedó.',
     quote: '¿Sientes que valió la pena quedarte en el Guaviare?',
     credit: 'pregunta sin responder, todavía',
-    image: 'assets/ilustracion4.jpeg',
+    image: 'assets/ilustracion4.webp',
     video: 'assets/videoIlustracion.mp4',
     accent: '#9C6B3A',
     accent2: '#7A2E2A',
@@ -102,7 +102,7 @@ export const JOURNEY_ERAS: readonly JourneyEra[] = [
     title: 'Todos pagaban.',
     quote: 'A veces ni el efectivo alcanzaba — todo se pagaba y se cobraba en gramos.',
     credit: 'Padre y Abuela Oliva',
-    image: 'assets/ilustracion7.jpeg',
+    image: 'assets/ilustracion7.webp',
     video: 'assets/ilustracion7video.mp4',
     accent: '#8C6A2E',
     accent2: '#5C4A1E',
@@ -116,7 +116,7 @@ export const JOURNEY_ERAS: readonly JourneyEra[] = [
     title: 'Antes de la coca ya existía el endeude. Antes de la guerra ya existía la orfandad.',
     quote: 'Tuvo que internarse en el monte y valerse por sí solo en una selva inclemente.',
     credit: 'Abuelo Ángel',
-    image: 'assets/ilustracion3.jpeg',
+    image: 'assets/ilustracion3.webp',
     video: 'assets/ilustracion3video.mp4',
     accent: '#7FA06A',
     accent2: '#6B6B3A',
@@ -133,7 +133,7 @@ export const JOURNEY_ERAS: readonly JourneyEra[] = [
     quote:
       'El Legado del Guaviare es la historia de una familia contada hacia atrás, generación por generación, hasta el origen de todo.',
     credit: '',
-    image: 'assets/mascara-campo.jpeg',
+    image: 'assets/mascara-campo.webp',
     video: 'assets/mascaraCaminandoMejor.mp4',
     accent: '#cf9a52',
     accent2: '#2e3a30',

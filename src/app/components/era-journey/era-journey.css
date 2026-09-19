@@ -92,7 +92,7 @@
 /* ---------- Cierre: sin el tinte café del sepia/velo genéricos. El texto
    (app-closing) lleva su propio oscurecido, así que el video queda claro. ---------- */
 .journey-layer--cierre img, .journey-layer--cierre video {
-  filter: grayscale(0.2) contrast(1.08) saturate(0.85) brightness(1.05);
+  filter: grayscale(0.08) contrast(1.05) saturate(1) brightness(1.3);
 }
 .journey-layer--cierre .journey-wash { opacity: 0.1; }
 
@@ -117,7 +117,15 @@
   position: absolute; inset: 0; z-index: 2; pointer-events: none;
   background:
     radial-gradient(ellipse at 50% 55%, transparent 42%, rgba(4, 3, 2, 0.55) 100%),
-    linear-gradient(to bottom, rgba(4, 3, 2, 0.55) 0%, transparent 22%, transparent 72%, rgba(4, 3, 2, 0.88) 100%);
+    linear-gradient(to bottom, rgba(4, 3, 2, 0.55) 0%, transparent 22%);
+}
+/* La parte de abajo es la que se afloja al llegar al cierre (hasta la mitad),
+   siguiendo el mismo tramo de fundido que la escena (--start/--fade los pone
+   el template). El borde de arriba no: es donde se lee la marca. */
+.journey-vignette::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 72%, rgba(4, 3, 2, 0.88) 100%);
+  opacity: calc(1 - 0.5 * clamp(0, calc((var(--progress, 0) - var(--start, 2) + var(--fade, 0.035)) / var(--fade, 0.035)), 1));
 }
 .journey-grain {
   position: absolute; inset: 0; z-index: 2; opacity: 0.15; mix-blend-mode: overlay; pointer-events: none;

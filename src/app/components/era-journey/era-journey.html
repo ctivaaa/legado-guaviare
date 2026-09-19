@@ -28,10 +28,11 @@
         @if (era.video) {
           <video
             [src]="era.video"
-            [poster]="era.image"
+            [attr.poster]="active() ? era.image : null"
+            aria-hidden="true"
             [muted]="true"
-            [appLazyPlay]="isNear(i)"
-            [preload]="isNear(i) ? 'auto' : 'none'"
+            [appLazyPlay]="active() && isNear(i)"
+            [preload]="active() && isNear(i) ? 'auto' : 'none'"
             loop
             playsinline
           ></video>
@@ -63,11 +64,16 @@
       </div>
     }
 
-    <div class="journey-vignette"></div>
+    <div
+      class="journey-vignette"
+      [style.--start]="windowStart(closingIndex)"
+      [style.--fade]="fade"
+    ></div>
     <div class="journey-grain"></div>
 
     @for (era of eras; track era.id; let i = $index) {
-      @if (era.id !== 'cierre') {
+      <!-- Sin título no hay bloque de texto: evita <h2> vacíos. -->
+      @if (era.id !== 'cierre' && era.title) {
         <div
           class="journey-text"
           [class.journey-text--hero]="era.id === 'hero'"

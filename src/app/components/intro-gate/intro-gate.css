@@ -33,11 +33,13 @@
   font-family: 'Caveat', cursive; font-size: 19px; color: #C98B52; margin: 0 0 14px;
   letter-spacing: 0.01em;
 }
-h1 {
-  margin: 0; font-family: 'Fraunces', serif; font-size: clamp(38px, 7vw, 76px); line-height: 1.02;
-  color: var(--ink, #F3EEDD);
+/* No es un <h1>: el único <h1> de la página es la marca de la cabecera
+   (stamp-nav), que sigue ahí cuando esta pantalla se va. */
+.intro-title {
+  margin: 0; font-family: 'Fraunces', serif; font-size: clamp(38px, 7vw, 76px); font-weight: 500;
+  letter-spacing: -0.01em; line-height: 1.02; color: var(--ink, #F3EEDD);
 }
-h1 em { font-style: italic; color: #C98B52; }
+.intro-title em { font-style: italic; color: #C98B52; white-space: nowrap; }
 
 .intro-sub {
   margin: 22px auto 0; max-width: 46ch; color: var(--ink-dim, #CFC9B4);
@@ -46,7 +48,7 @@ h1 em { font-style: italic; color: #C98B52; }
 
 .intro-btn {
   margin-top: 40px; display: inline-flex; align-items: center; gap: 12px;
-  padding: 16px 34px; background: #9C6B3A; color: #171310; border: 0; cursor: pointer;
+  padding: 16px 34px; background: #B8823F; color: #171310; border: 0; cursor: pointer;
   font-family: 'Fraunces', serif; font-style: italic; font-size: 18px;
   clip-path: polygon(2% 0, 100% 4%, 98% 100%, 0 96%);
   transition: transform 0.3s ease, box-shadow 0.3s ease;

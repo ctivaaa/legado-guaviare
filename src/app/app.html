@@ -4,10 +4,11 @@
 
 <div class="bg-layer" [style.background-color]="tracker.bgColor()"></div>
 
-@if (started()) {
-  <app-stamp-nav />
+<!-- El contenido existe desde el principio (lo leen buscadores y lectores de
+     pantalla sin hacer clic en "Empezar"); mientras la pantalla de inicio está
+     encima queda inerte: sin foco, sin clics y sin teclas. -->
+<app-stamp-nav [attr.inert]="started() ? null : ''" />
 
-  <main>
-    <app-era-journey />
-  </main>
-}
+<main [attr.inert]="started() ? null : ''">
+  <app-era-journey [active]="started()" />
+</main>

@@ -1,4 +1,4 @@
-import { Component, ElementRef, afterNextRender, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, afterNextRender, computed, effect, inject, input, signal, viewChild } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { ScrollScrub } from '../../directives/scroll-scrub';
 import { LazyPlay } from '../../directives/lazy-play';
@@ -24,6 +24,9 @@ const FADE = JOURNEY_FADE;
   styleUrl: './era-journey.css',
 })
 export class EraJourney {
+  /** False mientras la pantalla de inicio está encima: el teclado no debe mover la escena. */
+  readonly active = input(true);
+
   protected readonly eras = JOURNEY_LAYERS;
   protected readonly fade = FADE;
   /** Posiciones (izquierda %) del polvo ambiental que flota dentro de cada capa. */
@@ -66,7 +69,7 @@ export class EraJourney {
    * casi no se nota. Home/End se dejan al navegador, que ya hace lo correcto.
    */
   protected onKeydown(event: KeyboardEvent): void {
-    if (event.defaultPrevented || event.repeat || event.ctrlKey || event.altKey || event.metaKey) return;
+    if (!this.active() || event.defaultPrevented || event.repeat || event.ctrlKey || event.altKey || event.metaKey) return;
 
     let delta: 1 | -1;
     switch (event.key) {

@@ -87,6 +87,9 @@ class SeamlessLoop {
   selector: 'app-intro-gate',
   host: {
     class: 'intro-gate',
+    role: 'dialog',
+    'aria-modal': 'true',
+    'aria-label': 'El Legado del Guaviare',
     '[class.leaving]': 'leaving()',
     '(document:keydown)': 'onKeydown($event)',
   },

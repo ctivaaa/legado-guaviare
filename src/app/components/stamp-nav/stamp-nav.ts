@@ -26,21 +26,22 @@ export class StampNav {
   protected readonly autoScroll = inject(AutoScroll);
 
   /** Una entrada por capa, con el titular real de la escena (su primera frase,
-   * para que los largos quepan); las que aún no tienen título salen pendientes. */
+   * para que los largos quepan). Los capítulos que aún no tienen título salen
+   * como "Capítulo N": nunca texto de relleno, que se publicaría e indexaría. */
   protected readonly entries = computed(() =>
-    this.tracker.layers().map((era) => {
-      const label = era.title.split(/(?<=[.?!])\s/)[0];
-      return { id: era.id, label: label || '[ título pendiente ]', pending: !label, accent: era.accent };
+    this.tracker.layers().map((era, i) => {
+      const title = era.title.split(/(?<=[.?!])\s/)[0];
+      return { id: era.id, label: title || `Capítulo ${i + 1}`, pending: !title, accent: era.accent };
     }),
   );
 
   /** Aviso para lectores de pantalla cada vez que cambia el capítulo. */
   protected readonly announcement = computed(() => {
     const entries = this.entries();
-    const current = entries[this.tracker.activeIndex()];
+    const i = this.tracker.activeIndex();
+    const current = entries[i];
     if (!current) return '';
-    const title = current.pending ? 'sin título todavía' : current.label;
-    return `Capítulo ${this.tracker.activeIndex() + 1} de ${entries.length}: ${title}`;
+    return current.pending ? `Capítulo ${i + 1} de ${entries.length}` : `Capítulo ${i + 1} de ${entries.length}: ${current.label}`;
   });
 
   private readonly menuOpenSignal = signal(false);

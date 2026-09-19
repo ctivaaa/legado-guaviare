@@ -7,7 +7,9 @@
   opacity: 0.55; transition: opacity 0.3s ease;
 }
 .brand-group:hover, .brand-group:focus-within { opacity: 1; }
-.brand { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 600; pointer-events: auto; color: var(--ink); }
+/* Es el <h1> de toda la página (el único, siempre presente): se estiliza como
+   la marca de la cabecera, no como un titular. */
+.brand { margin: 0; font-family: 'Fraunces', serif; font-size: 16px; font-weight: 600; letter-spacing: normal; pointer-events: auto; color: var(--ink); text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6); }
 .brand em { font-style: italic; color: #C98B52; }
 
 /* ---------- Barra de controles: fija, siempre visible (no se desvanece
