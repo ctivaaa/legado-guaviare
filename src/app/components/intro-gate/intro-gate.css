@@ -53,6 +53,7 @@ h1 em { font-style: italic; color: #C98B52; }
   box-shadow: 0 18px 40px -16px rgba(201, 154, 62, 0.55);
 }
 .intro-btn:hover, .intro-btn:focus-visible { transform: translateY(-3px) rotate(-1deg); }
+.intro-btn:focus-visible { outline: 2px solid var(--paper, #EFE6D2); outline-offset: 4px; }
 .intro-btn svg { width: 18px; height: 18px; stroke: #171310; fill: none; stroke-width: 2; }
 
 .intro-hint {

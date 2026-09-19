@@ -1,6 +1,6 @@
-import { Component, afterNextRender, output, signal } from '@angular/core';
+import { Component, ElementRef, afterNextRender, output, signal, viewChild } from '@angular/core';
 
-const AUDIO_SRC = 'assets/audio/ranas-serrania.wav';
+const AUDIO_SRC = 'assets/audio/ranas-serrania.m4a';
 const VOLUME = 0.55;
 const FADE_OUT_S = 0.5;
 /** Cuánto se solapan el final y el arranque de cada vuelta del loop — así el
@@ -88,6 +88,7 @@ class SeamlessLoop {
   host: {
     class: 'intro-gate',
     '[class.leaving]': 'leaving()',
+    '(document:keydown)': 'onKeydown($event)',
   },
   templateUrl: './intro-gate.html',
   styleUrl: './intro-gate.css',
@@ -95,6 +96,7 @@ class SeamlessLoop {
 export class IntroGate {
   readonly start = output<void>();
   protected readonly leaving = signal(false);
+  private readonly startButton = viewChild.required<ElementRef<HTMLButtonElement>>('startBtn');
 
   private ctx: AudioContext | null = null;
   private loop: SeamlessLoop | null = null;
@@ -102,6 +104,9 @@ export class IntroGate {
   private removeGestureListeners: (() => void) | null = null;
 
   constructor() {
+    // El foco arranca en "Empezar": con teclado basta Enter/Espacio, sin tener que tabular hasta él.
+    afterNextRender(() => this.startButton().nativeElement.focus());
+
     afterNextRender(() => {
       const AudioCtx = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (!AudioCtx) return;
@@ -140,6 +145,14 @@ export class IntroGate {
     } else {
       this.loop.start();
     }
+  }
+
+  /** Las teclas con las que se "avanza" en cualquier sitio también empiezan el recorrido. */
+  protected onKeydown(event: KeyboardEvent): void {
+    if (event.ctrlKey || event.altKey || event.metaKey) return;
+    if (!['ArrowDown', 'PageDown', ' ', 'Enter'].includes(event.key)) return;
+    event.preventDefault();
+    this.onStart();
   }
 
   onStart(): void {

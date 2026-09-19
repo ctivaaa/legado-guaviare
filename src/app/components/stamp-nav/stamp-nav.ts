@@ -1,19 +1,20 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { EraTracker } from '../../services/era-tracker';
 import { AmbientAudio } from '../../services/ambient-audio';
 import { AutoScroll } from '../../services/auto-scroll';
-import { EraIconGlyph } from '../era-icon/era-icon';
 
 /**
- * Navegación fija: el nombre del documental a la izquierda y, a la derecha,
- * un "sello" circular que muestra el icono de la época actual y, al abrirlo,
- * un menú en abanico para saltar directamente a cualquier época.
+ * Navegación fija: el nombre del documental arriba a la izquierda, la barra de
+ * controles abajo a la izquierda y, a la derecha, un panel vertical con todas
+ * las épocas ("IR A UNA ÉPOCA · 2 de 7") para saltar directamente a cualquiera.
+ * Cerrado muestra solo el contador y un riel de puntos; el encabezado lo abre
+ * y se cierra al elegir una época, al hacer clic fuera o con Escape.
  */
 @Component({
   selector: 'app-stamp-nav',
-  imports: [EraIconGlyph],
   host: {
     '(document:click)': 'closeMenu()',
+    '(document:keydown.escape)': 'closeMenu()',
     '(document:fullscreenchange)': 'onFullscreenChange()',
   },
   templateUrl: './stamp-nav.html',
@@ -24,27 +25,29 @@ export class StampNav {
   protected readonly ambientAudio = inject(AmbientAudio);
   protected readonly autoScroll = inject(AutoScroll);
 
+  /** Una entrada por capa, con el titular real de la escena (su primera frase,
+   * para que los largos quepan); las que aún no tienen título salen pendientes. */
+  protected readonly entries = computed(() =>
+    this.tracker.layers().map((era) => {
+      const label = era.title.split(/(?<=[.?!])\s/)[0];
+      return { id: era.id, label: label || '[ título pendiente ]', pending: !label, accent: era.accent };
+    }),
+  );
+
+  /** Aviso para lectores de pantalla cada vez que cambia el capítulo. */
+  protected readonly announcement = computed(() => {
+    const entries = this.entries();
+    const current = entries[this.tracker.activeIndex()];
+    if (!current) return '';
+    const title = current.pending ? 'sin título todavía' : current.label;
+    return `Capítulo ${this.tracker.activeIndex() + 1} de ${entries.length}: ${title}`;
+  });
+
   private readonly menuOpenSignal = signal(false);
   readonly menuOpen = this.menuOpenSignal.asReadonly();
 
-  private readonly activeSection = computed(() =>
-    this.tracker.sections().find((s) => s.id === this.tracker.activeId()),
-  );
-  readonly activeIcon = computed(() => this.activeSection()?.icon ?? null);
-  readonly activeAccent = computed(() => this.activeSection()?.accent ?? '#9C6B3A');
-
-  private readonly rotationSignal = signal(-4);
-  readonly rotation = this.rotationSignal.asReadonly();
-
   private readonly fullscreenSignal = signal(false);
   readonly isFullscreen = this.fullscreenSignal.asReadonly();
-
-  constructor() {
-    effect(() => {
-      this.tracker.activeId();
-      this.rotationSignal.set(Math.random() * 4 - 8);
-    });
-  }
 
   toggleAudio(event: Event): void {
     event.stopPropagation();

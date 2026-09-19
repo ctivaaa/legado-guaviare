@@ -1,6 +1,10 @@
 {
   "name": "legado-guaviare",
   "version": "0.0.0",
+  "author": "Kawede (https://www.instagram.com/kawede)",
+  "contributors": [
+    "Ctivaaa (https://github.com/ctivaaa)"
+  ],
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

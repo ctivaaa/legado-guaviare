@@ -70,7 +70,9 @@ export const JOURNEY_ERAS: readonly JourneyEra[] = [
     title: 'La quemaron.',
     quote: 'Vi todo mi esfuerzo convertirse en cenizas.',
     credit: 'Tío Jhon',
-    image: 'assets/ilustracion9.jpeg',
+    // Poster = primer fotograma del propio video (no la ilustración del bus
+    // quemándose, que se alcanzaba a ver en el scroll mientras cargaba el video).
+    image: 'assets/poster-flota.jpg',
     video: 'assets/videoCarro.mp4',
     // blood-bright — único uso en toda la paleta de "la quemaron" (alimenta
     // el punto de polvo ambiental y el indicador de nav de esta época).
@@ -120,18 +122,20 @@ export const JOURNEY_ERAS: readonly JourneyEra[] = [
     accent2: '#6B6B3A',
   },
   {
-    // Cierre nuevo — todavía sin título/testimonio, solo el video de fondo.
+    // Cierre: el video de fondo se mantiene y encima va la pantalla de créditos
+    // (ver app-closing), con un oscurecido solo en su zona para que se lea.
     id: 'cierre',
     icon: 'water',
     label: 'Cierre',
     range: '',
-    tag: '',
-    title: '',
-    quote: '',
+    tag: '— fin del recorrido —',
+    title: 'Gracias por llegar hasta la raíz.',
+    quote:
+      'El Legado del Guaviare es la historia de una familia contada hacia atrás, generación por generación, hasta el origen de todo.',
     credit: '',
     image: 'assets/mascara-campo.jpeg',
     video: 'assets/mascaraCaminandoMejor.mp4',
-    accent: '#7FA06A',
+    accent: '#cf9a52',
     accent2: '#2e3a30',
   },
 ];

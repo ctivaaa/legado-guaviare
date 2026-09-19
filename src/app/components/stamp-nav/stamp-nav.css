@@ -121,69 +121,106 @@
   .control-label { display: none; }
 }
 
-/* ---------- Sello circular con menú en abanico ---------- */
-.stamp {
-  position: fixed; top: 22px; right: 26px; z-index: 80; width: 120px;
-  transform: rotate(var(--rot, -4deg)); transition: transform 0.35s cubic-bezier(.2, .8, .3, 1.2), opacity 0.3s ease;
-  cursor: pointer; opacity: 0.7;
+/* ---------- Panel de épocas desplegable: cerrado es solo el contador y un
+   riel de puntos (uno por época, clicables); al abrirlo aparecen el título y
+   el texto de cada época. La activa va en blanco/negrita con el punto relleno
+   del color de su época; las que aún no tienen título salen atenuadas y con el
+   punto punteado. ---------- */
+.epochs {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 80; width: min(420px, 100vw);
+  display: flex; flex-direction: column; padding: 22px 26px 26px 0; pointer-events: none;
 }
-.stamp:hover, .stamp:focus-within, .stamp.menu-open { opacity: 1; }
-.stamp:hover { transform: rotate(0deg) scale(1.06) translateY(-2px); }
+/* El degradado va en un pseudo-elemento porque un background-image no se
+   puede animar, pero su opacidad sí. */
+.epochs::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0;
+  background: linear-gradient(to left, rgba(6, 11, 8, 0.78) 0%, rgba(6, 11, 8, 0.5) 55%, transparent 100%);
+  transition: opacity 0.35s ease;
+}
+.epochs.open::before { opacity: 1; }
 
-.stamp-icon-card {
-  position: relative; z-index: 2; width: 68px; height: 68px; margin: 0 auto -18px;
-  background: var(--stampcolor, #9C6B3A); border-radius: 50%; border: 0; padding: 0; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transform: rotate(-4deg); transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.5s ease;
-  box-shadow: 0 14px 24px -8px rgba(0, 0, 0, 0.6), 0 0 0 4px rgba(255, 255, 255, 0.06);
+.epochs-head {
+  align-self: flex-end; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+  margin-right: -8px; padding: 6px 8px; background: none; border: 0; border-radius: 6px;
+  cursor: pointer; pointer-events: auto; text-align: right; color: var(--ink);
 }
-.stamp-icon-card:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
-.stamp:hover .stamp-icon-card { transform: rotate(2deg) scale(1.1); box-shadow: 0 18px 30px -9px rgba(0, 0, 0, 0.65), 0 0 0 4px rgba(255, 255, 255, 0.1); }
-.stamp-icon-card::after {
-  content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none; mix-blend-mode: overlay; opacity: 0.25;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+.epochs-head:focus-visible { outline: 2px solid var(--paper); outline-offset: 1px; }
+.epochs-kicker {
+  max-height: 0; overflow: hidden; opacity: 0; white-space: nowrap;
+  font-family: 'Fraunces', serif; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.18em; color: #8a8f80;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
 }
-.stamp-tape {
-  position: absolute; top: -7px; left: 50%; margin-left: -20px; width: 40px; height: 14px; z-index: 3;
-  background: var(--paper); opacity: 0.85; transform: rotate(-5deg);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+.epochs.open .epochs-kicker { max-height: 16px; opacity: 1; }
+.epochs-count {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: var(--ink);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
 }
-.stamp-icon { display: block; position: relative; z-index: 1; width: 36px; height: 36px; color: #181410; --icon-stroke-width: 1.9; }
+.epochs-chevron {
+  width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.4;
+  stroke-linecap: round; stroke-linejoin: round; opacity: 0.7; transition: transform 0.3s ease;
+}
+.epochs.open .epochs-chevron { transform: rotate(180deg); }
 
-/* ---------- Menú en abanico: todos los íconos, navegación directa ---------- */
-.stamp-menu {
-  position: absolute; top: 78px; left: 50%;
-  transform: translateX(-50%) translateY(-8px);
-  display: flex; flex-direction: column; gap: 12px; align-items: center;
-  opacity: 0; visibility: hidden; pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s linear 0.25s;
-  z-index: 5;
+.epochs-list {
+  position: relative; flex: 1; margin: 18px 0 0; padding: 0; list-style: none;
+  display: flex; flex-direction: column; justify-content: center;
 }
-.stamp.menu-open .stamp-menu, .stamp:hover .stamp-menu {
-  opacity: 1; visibility: visible; pointer-events: auto; transform: translateX(-50%) translateY(0);
-  transition: opacity 0.25s ease 0.04s, transform 0.25s ease 0.04s;
+/* Riel: pasa por el centro de la columna de puntos (18px de ancho → 9px). */
+.epochs-list::before {
+  content: ''; position: absolute; top: 0; bottom: 0; right: 8px; width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(239, 230, 210, 0.22) 12%, rgba(239, 230, 210, 0.22) 88%, transparent);
 }
-.stamp-menu-item {
-  position: relative; width: 38px; height: 38px; border-radius: 50%; border: 0;
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
-  box-shadow: 0 8px 16px -6px rgba(0, 0, 0, 0.55);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.stamp-menu-item:hover, .stamp-menu-item:focus-visible { transform: scale(1.18); box-shadow: 0 10px 20px -6px rgba(0, 0, 0, 0.65); }
-.stamp-menu-item.active { box-shadow: 0 0 0 2px var(--paper), 0 8px 16px -6px rgba(0, 0, 0, 0.55); }
-.stamp-menu-item app-era-icon { width: 16px; height: 16px; color: #181410; pointer-events: none; }
-.stamp-menu-tip {
-  position: absolute; right: 50px; top: 50%; transform: translateY(-50%) translateX(6px);
-  white-space: nowrap; background: var(--paper); color: #2A2318; padding: 5px 11px;
-  font-family: 'Caveat', cursive; font-size: 14.5px; line-height: 1.1;
-  box-shadow: 0 8px 16px -6px rgba(0, 0, 0, 0.4);
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.18s ease, transform 0.18s ease;
-}
-.stamp-menu-item:hover .stamp-menu-tip, .stamp-menu-item:focus-visible .stamp-menu-tip { opacity: 1; transform: translateY(-50%) translateX(0); }
+.epochs-list li { display: flex; justify-content: flex-end; }
 
-@media (max-width: 760px) {
-  .stamp { width: 96px; top: 14px; right: 14px; }
-  .stamp-icon-card { width: 54px; height: 54px; margin-bottom: -14px; }
-  .stamp-icon { width: 28px; height: 28px; }
+.epoch {
+  position: relative; display: flex; align-items: center; justify-content: flex-end; gap: 14px;
+  padding: 17px 0; background: none; border: 0; cursor: pointer; pointer-events: auto;
+  text-align: right; color: #8a8f80;
+  transition: color 0.3s ease;
+}
+.epochs.open .epoch { width: 100%; }
+.epoch:hover, .epoch:focus-visible { color: var(--ink-dim); }
+.epoch:focus-visible { outline: 2px solid var(--paper); outline-offset: -2px; border-radius: 4px; }
+
+/* Cerrado, el texto queda colapsado (max-width 0) pero sigue en el DOM como
+   nombre accesible del botón. */
+.epoch-label {
+  max-width: 0; overflow: hidden; opacity: 0; white-space: nowrap; text-overflow: ellipsis;
+  font-family: 'Fraunces', serif; font-style: italic; font-weight: 500; font-size: 14px; line-height: 1.25;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+  transition: max-width 0.35s ease, opacity 0.3s ease, font-size 0.3s ease;
+}
+.epochs.open .epoch-label { max-width: min(340px, calc(100vw - 90px)); opacity: 1; }
+.epoch-dot { flex: none; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; }
+.epoch-dot::before {
+  content: ''; box-sizing: border-box; width: 11px; height: 11px; border-radius: 50%;
+  border: 1.5px solid currentColor; background: #0c1310;
+  transition: width 0.3s ease, height 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+}
+
+.epoch.active { color: #fff; }
+.epoch.active .epoch-label { font-style: normal; font-weight: 700; font-size: 15px; }
+.epoch.active .epoch-dot::before {
+  width: 18px; height: 18px; background: var(--dot, #a5242b); border: 2px solid #D9A066;
+  box-shadow: 0 0 0 3px rgba(217, 160, 102, 0.15);
+}
+
+.epoch.pending { color: #5f6559; }
+.epoch.pending:hover, .epoch.pending:focus-visible { color: #8a8f80; }
+.epoch.pending .epoch-dot::before { border-style: dashed; }
+.epoch.pending.active { color: #d9d4c2; }
+
+@media (prefers-reduced-motion: reduce) {
+  .epochs::before, .epochs-kicker, .epochs-chevron, .epoch, .epoch-label, .epoch-dot::before { transition: none; }
+}
+
+@media (max-width: 900px) {
+  .epochs { padding-right: 14px; }
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap; border: 0;
 }

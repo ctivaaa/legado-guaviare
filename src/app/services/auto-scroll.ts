@@ -1,7 +1,7 @@
 import { DestroyRef, Injectable, afterNextRender, inject, signal } from '@angular/core';
 
 const SPEED_PX_PER_FRAME = 1.6;
-const SCROLL_KEYS = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End']);
+const SCROLL_KEYS = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ']);
 
 /**
  * Avance automático tipo "deja que avance solo": desplaza la página a paso

@@ -26,7 +26,15 @@
         [style.--accent]="era.accent"
       >
         @if (era.video) {
-          <video [src]="era.video" [poster]="era.image" [muted]="true" [appLazyPlay]="isNear(i)" loop playsinline></video>
+          <video
+            [src]="era.video"
+            [poster]="era.image"
+            [muted]="true"
+            [appLazyPlay]="isNear(i)"
+            [preload]="isNear(i) ? 'auto' : 'none'"
+            loop
+            playsinline
+          ></video>
         } @else {
           <img [ngSrc]="era.image" [alt]="era.tag" fill [priority]="i === 0" />
         }
@@ -59,39 +67,44 @@
     <div class="journey-grain"></div>
 
     @for (era of eras; track era.id; let i = $index) {
-      <div
-        class="journey-text"
-        [class.journey-text--hero]="era.id === 'hero'"
-        [class.journey-text--flota]="era.id === 'flota'"
-        [class.journey-no-fadeout]="i === eras.length - 1"
-        [style.--start]="windowStart(i)"
-        [style.--end]="windowEnd(i)"
-        [style.--fade]="fade"
-        [style.--accent]="era.accent"
-      >
-        @if (era.tag) {
-          <span class="journey-tag">{{ era.tag }}</span>
-        }
-        <div class="journey-title-tilt" [class.journey-title-tilt--flota]="era.id === 'flota'">
-          <h2 [class.journey-impact]="era.id === 'flota' && flotaHit()">{{ era.title }}</h2>
+      @if (era.id !== 'cierre') {
+        <div
+          class="journey-text"
+          [class.journey-text--hero]="era.id === 'hero'"
+          [class.journey-text--flota]="era.id === 'flota'"
+          [class.journey-no-fadeout]="i === eras.length - 1"
+          [style.--start]="windowStart(i)"
+          [style.--end]="windowEnd(i)"
+          [style.--fade]="fade"
+          [style.--accent]="era.accent"
+        >
+          @if (era.tag) {
+            <span class="journey-tag">{{ era.tag }}</span>
+          }
+          <div class="journey-title-tilt" [class.journey-title-tilt--flota]="era.id === 'flota'">
+            <h2 [class.journey-impact]="era.id === 'flota' && flotaHit()">{{ era.title }}</h2>
+          </div>
+          @if (era.quote) {
+            <blockquote class="journey-quote">
+              "{{ era.quote }}"
+              @if (era.credit) {
+                <cite>— {{ era.credit }}</cite>
+              }
+            </blockquote>
+          }
         </div>
-        @if (era.quote) {
-          <blockquote class="journey-quote">
-            "{{ era.quote }}"
-            @if (era.credit) {
-              <cite>— {{ era.credit }}</cite>
-            }
-          </blockquote>
-        }
-      </div>
+      }
     }
 
-    <div class="journey-index">
-      @for (era of eras; track era.id; let i = $index) {
-        @if (era.icon) {
-          <span class="journey-dot" [style.--start]="windowStart(i)" [style.--end]="windowEnd(i)" [style.--fade]="fade"></span>
-        }
-      }
-    </div>
+    @if (closingEra) {
+      <!-- inert mientras no ha aparecido: sus botones no deben recibir clic ni foco a ciegas. -->
+      <app-closing
+        [era]="closingEra"
+        [attr.inert]="closingActive() ? null : ''"
+        [style.--start]="windowStart(closingIndex)"
+        [style.--fade]="fade"
+        [style.--accent]="closingEra.accent"
+      />
+    }
   </div>
 </div>

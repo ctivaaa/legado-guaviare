@@ -1,0 +1,20 @@
+<div class="closing__inner">
+  <p class="closing__kicker">{{ era().tag }}</p>
+  <h2 class="closing__title">{{ era().title }}</h2>
+  <p class="closing__text">{{ era().quote }}</p>
+  <div class="closing__divider" aria-hidden="true"></div>
+
+  <ul class="closing__credits">
+    @for (c of credits; track c.role) {
+      <li>{{ c.role }} — <span class="closing__name">{{ c.by }}</span></li>
+    }
+    <li>Un proyecto de &#64;kawede — Guaviare, Colombia</li>
+  </ul>
+
+  <div class="closing__actions">
+    <button type="button" class="btn btn--primary" (click)="restart()">Volver a ver desde el inicio</button>
+    <button type="button" class="btn btn--ghost" (click)="share()">
+      <span aria-live="polite">{{ copied() ? 'Enlace copiado' : 'Compartir este proyecto' }}</span>
+    </button>
+  </div>
+</div>

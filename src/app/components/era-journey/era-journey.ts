@@ -1,9 +1,10 @@
-import { Component, ElementRef, afterNextRender, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, afterNextRender, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { ScrollScrub } from '../../directives/scroll-scrub';
 import { LazyPlay } from '../../directives/lazy-play';
 import { EraTracker } from '../../services/era-tracker';
-import { JOURNEY_ERAS, JOURNEY_FADE, JOURNEY_LAYERS } from '../../data/journey';
+import { Closing } from '../closing/closing';
+import { JOURNEY_FADE, JOURNEY_LAYERS, JourneyEra } from '../../data/journey';
 
 const FADE = JOURNEY_FADE;
 
@@ -17,7 +18,8 @@ const FADE = JOURNEY_FADE;
  */
 @Component({
   selector: 'app-era-journey',
-  imports: [ScrollScrub, NgOptimizedImage, LazyPlay],
+  host: { '(document:keydown)': 'onKeydown($event)' },
+  imports: [ScrollScrub, NgOptimizedImage, LazyPlay, Closing],
   templateUrl: './era-journey.html',
   styleUrl: './era-journey.css',
 })
@@ -27,16 +29,25 @@ export class EraJourney {
   /** Posiciones (izquierda %) del polvo ambiental que flota dentro de cada capa. */
   protected readonly dust = [8, 22, 38, 52, 66, 80, 92];
 
+  /** El cierre no es una época con texto propio: es la pantalla de créditos. */
+  protected readonly closingIndex = this.eras.findIndex((e) => e.id === 'cierre');
+  protected readonly closingEra = this.eras[this.closingIndex] as JourneyEra | undefined;
+
   private readonly scrub = viewChild.required(ScrollScrub);
   private readonly runwayRef = viewChild.required<ElementRef<HTMLElement>>('runway');
   private readonly tracker = inject(EraTracker);
+
+  /** True desde que empieza a fundirse el cierre — antes de eso está inerte. */
+  protected readonly closingActive = computed(
+    () => this.scrub().progress() >= this.windowStart(this.closingIndex) - this.fade,
+  );
 
   /** Una vez true, se queda así: dispara la entrada "de golpe" del titular de la flota. */
   protected readonly flotaHit = signal(false);
 
   constructor() {
     afterNextRender(() => {
-      this.tracker.registerJourney(this.runwayRef().nativeElement, this.eras, JOURNEY_ERAS);
+      this.tracker.registerJourney(this.runwayRef().nativeElement, this.eras);
     });
 
     effect(() => {
@@ -47,6 +58,40 @@ export class EraJourney {
         this.flotaHit.set(true);
       }
     });
+  }
+
+  /**
+   * Navegación por teclado, como en un sitio normal pero por capítulos: cada
+   * capítulo mide más de una pantalla de scroll, así que la flecha nativa (~40px)
+   * casi no se nota. Home/End se dejan al navegador, que ya hace lo correcto.
+   */
+  protected onKeydown(event: KeyboardEvent): void {
+    if (event.defaultPrevented || event.repeat || event.ctrlKey || event.altKey || event.metaKey) return;
+
+    let delta: 1 | -1;
+    switch (event.key) {
+      case 'ArrowDown':
+      case 'PageDown':
+        delta = 1;
+        break;
+      case 'ArrowUp':
+      case 'PageUp':
+        delta = -1;
+        break;
+      case ' ':
+        delta = event.shiftKey ? -1 : 1;
+        break;
+      default:
+        return;
+    }
+
+    const target = event.target instanceof HTMLElement ? event.target : null;
+    // Campos de texto y listas usan estas teclas para lo suyo.
+    if (target?.closest('input, textarea, select, [contenteditable="true"], [role="listbox"]')) return;
+    // Espacio sobre un botón/enlace es "activarlo", no "avanzar".
+    if (event.key === ' ' && target?.closest('button, a, summary, [role="button"]')) return;
+
+    if (this.tracker.step(delta)) event.preventDefault();
   }
 
   protected windowStart(i: number): number {

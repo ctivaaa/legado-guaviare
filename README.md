@@ -1,4 +1,11 @@
-# LegadoGuaviare
+# El Legado del Guaviare
+
+## Autoría
+
+- **Kawede** ([@kawede](https://www.instagram.com/kawede)) — autor principal: la historia, el contenido y todo lo demás.
+- **Ctivaaa** ([@ctivaaa](https://github.com/ctivaaa)) — autor de la página web (desarrollo).
+
+## Sobre el proyecto
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.7.
 

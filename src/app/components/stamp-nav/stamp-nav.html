@@ -50,40 +50,40 @@
   </button>
 </div>
 
-<div
-  class="stamp"
-  [class.menu-open]="menuOpen()"
-  [style.--stampcolor]="activeAccent()"
-  [style.--rot.deg]="rotation()"
->
+<p class="sr-only" role="status">{{ announcement() }}</p>
+
+<nav class="epochs" [class.open]="menuOpen()" aria-label="Ir a una época">
   <button
     type="button"
-    class="stamp-icon-card"
-    aria-haspopup="true"
+    class="epochs-head"
+    aria-controls="epochs-list"
     [attr.aria-expanded]="menuOpen()"
-    aria-label="Ir a una época"
     (click)="toggleMenu($event)"
   >
-    <div class="stamp-tape" aria-hidden="true"></div>
-    <span class="stamp-icon" aria-hidden="true">
-      @if (activeIcon(); as icon) {
-        <app-era-icon [icon]="icon" />
-      }
+    <span class="epochs-kicker">Ir a una época</span>
+    <span class="epochs-count">
+      {{ tracker.activeIndex() + 1 }} de {{ entries().length }}
+      <svg class="epochs-chevron" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4.5l4 4 4-4" /></svg>
     </span>
   </button>
 
-  <nav class="stamp-menu" aria-label="Ir a una época">
-    @for (era of tracker.iconEras(); track era.id) {
-      <button
-        type="button"
-        class="stamp-menu-item"
-        [class.active]="era.id === tracker.activeId()"
-        [style.background]="era.accent"
-        (click)="goTo(era.id, $event)"
-      >
-        <app-era-icon [icon]="era.icon!" />
-        <span class="stamp-menu-tip"><b>{{ era.label }}</b>{{ era.range }}</span>
-      </button>
+  <ol class="epochs-list" id="epochs-list">
+    @for (entry of entries(); track entry.id; let i = $index) {
+      <li>
+        <button
+          type="button"
+          class="epoch"
+          [class.active]="i === tracker.activeIndex()"
+          [class.pending]="entry.pending"
+          [style.--dot]="entry.accent"
+          [attr.aria-current]="i === tracker.activeIndex() ? 'step' : null"
+          [attr.tabindex]="menuOpen() ? 0 : -1"
+          (click)="goTo(entry.id, $event)"
+        >
+          <span class="epoch-label">{{ entry.label }}</span>
+          <span class="epoch-dot" aria-hidden="true"></span>
+        </button>
+      </li>
     }
-  </nav>
-</div>
+  </ol>
+</nav>

@@ -1,5 +1,8 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 import { JOURNEY_FADE, JourneyEra } from '../data/journey';
+
+/** Cuánto se recuerda el destino de una pulsación mientras dura el scroll suave. */
+const PENDING_MS = 900;
 
 function hexToRgb(hex: string): [number, number, number] {
   const clean = hex.replace('#', '');
@@ -18,8 +21,7 @@ function lerpColor(c1: string, c2: string, t: number): string {
  * Ya no hay una sección por época: todas viven como ventanas dentro de la
  * escena continua (`app-era-journey`), que arranca desde el propio hero. Este
  * servicio lee el progreso de esa única escena para saber en qué época está
- * el usuario — el sello flotante, el fondo de color y el indicador tipo rollo
- * de película leen de aquí.
+ * el usuario — el panel de épocas y el fondo de color leen de aquí.
  */
 @Injectable({ providedIn: 'root' })
 export class EraTracker {
@@ -27,36 +29,61 @@ export class EraTracker {
   private layersList: readonly JourneyEra[] = [];
   private runwayEl: HTMLElement | null = null;
 
-  /** Solo las épocas con ícono — para el sello de navegación. */
-  private readonly navSignal = signal<readonly JourneyEra[]>([]);
-  readonly sections = this.navSignal;
-  readonly iconEras = this.navSignal;
+  /** Las mismas capas, expuestas como señal — para el panel de navegación. */
+  readonly layers = signal<readonly JourneyEra[]>([]);
 
   readonly activeId = signal<string | null>(null);
+  readonly activeIndex = computed(() =>
+    Math.max(0, this.layers().findIndex((e) => e.id === this.activeId())),
+  );
   readonly bgColor = signal('#0B1712');
   readonly pageProgress = signal(0);
 
   private scrollAttached = false;
+  private pendingIndex: number | null = null;
+  private pendingTimer = 0;
 
   /** Se llama una sola vez, desde `app-era-journey`, con su pista de scroll. */
-  registerJourney(
-    runwayElement: HTMLElement,
-    layers: readonly JourneyEra[],
-    navEras: readonly JourneyEra[],
-  ): void {
+  registerJourney(runwayElement: HTMLElement, layers: readonly JourneyEra[]): void {
     this.runwayEl = runwayElement;
     this.layersList = layers;
-    this.navSignal.set(navEras);
+    this.layers.set(layers);
     this.attachScrollListener();
   }
 
   scrollTo(id: string): void {
-    if (!this.runwayEl) return;
-    const i = this.layersList.findIndex((e) => e.id === id);
-    if (i < 0) return;
+    this.scrollToIndex(this.layersList.findIndex((e) => e.id === id));
+  }
+
+  /**
+   * Avanza (+1) o retrocede (-1) un capítulo — lo usa el teclado. Si se pulsa
+   * varias veces mientras el scroll suave aún corre, `activeIndex` todavía no
+   * se movió; por eso se parte del destino pendiente y no de la época actual,
+   * o la segunda pulsación no haría nada. Devuelve false si no hay a dónde ir
+   * (para dejar que el navegador haga su scroll normal).
+   */
+  step(delta: 1 | -1): boolean {
+    const base = this.pendingIndex ?? Math.max(0, this.layersList.findIndex((e) => e.id === this.activeId()));
+    const next = base + delta;
+    if (next < 0 || next >= this.layersList.length) return false;
+
+    this.pendingIndex = next;
+    clearTimeout(this.pendingTimer);
+    this.pendingTimer = window.setTimeout(() => (this.pendingIndex = null), PENDING_MS);
+    this.scrollToIndex(next);
+    return true;
+  }
+
+  private scrollToIndex(i: number): void {
+    if (!this.runwayEl || i < 0 || i >= this.layersList.length) return;
     const total = this.runwayEl.offsetHeight - window.innerHeight;
-    const targetP = Math.min(i / this.layersList.length + JOURNEY_FADE + 0.02, 1);
-    window.scrollTo({ top: this.runwayEl.offsetTop + targetP * total, behavior: 'smooth' });
+    // El prólogo es el comienzo de la página: arriba del todo, no "un poco adentro".
+    const targetP = i === 0 ? 0 : Math.min(i / this.layersList.length + JOURNEY_FADE + 0.02, 1);
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({
+      top: this.runwayEl.offsetTop + targetP * total,
+      behavior: reduced ? 'auto' : 'smooth',
+    });
   }
 
   private attachScrollListener(): void {
