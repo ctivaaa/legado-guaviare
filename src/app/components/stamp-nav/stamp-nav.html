@@ -1,0 +1,89 @@
+<header class="nav">
+  <div class="brand-group">
+    <div class="brand">El Legado <em>del Guaviare</em></div>
+  </div>
+</header>
+
+<!-- Barra de controles: siempre visible, checkbox para sonido y toggles
+     circulares para avance automático / pantalla completa. -->
+<div class="control-bar" role="group" aria-label="Controles de reproducción">
+  @if (ambientAudio.available) {
+    <button
+      type="button"
+      class="control-item"
+      [class.checked]="!ambientAudio.muted()"
+      [attr.aria-pressed]="!ambientAudio.muted()"
+      [attr.aria-label]="ambientAudio.muted() ? 'Activar sonido ambiente' : 'Silenciar sonido ambiente'"
+      (click)="toggleAudio($event)"
+    >
+      <span class="control-box" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+      </span>
+      <span class="control-label">Sonido</span>
+    </button>
+    <span class="control-sep" aria-hidden="true"></span>
+  }
+
+  <button
+    type="button"
+    class="control-item"
+    [class.checked]="autoScroll.active()"
+    [attr.aria-pressed]="autoScroll.active()"
+    [attr.aria-label]="autoScroll.active() ? 'Pausar avance automático' : 'Dejar que avance solo'"
+    (click)="toggleAutoScroll($event)"
+  >
+    <span class="control-dot" aria-hidden="true"></span>
+    <span class="control-label">Avance automático</span>
+  </button>
+  <span class="control-sep" aria-hidden="true"></span>
+
+  <button
+    type="button"
+    class="control-item"
+    [class.checked]="isFullscreen()"
+    [attr.aria-pressed]="isFullscreen()"
+    [attr.aria-label]="isFullscreen() ? 'Salir de pantalla completa' : 'Pantalla completa'"
+    (click)="toggleFullscreen($event)"
+  >
+    <span class="control-dot" aria-hidden="true"></span>
+    <span class="control-label">Pantalla completa</span>
+  </button>
+</div>
+
+<div
+  class="stamp"
+  [class.menu-open]="menuOpen()"
+  [style.--stampcolor]="activeAccent()"
+  [style.--rot.deg]="rotation()"
+>
+  <button
+    type="button"
+    class="stamp-icon-card"
+    aria-haspopup="true"
+    [attr.aria-expanded]="menuOpen()"
+    aria-label="Ir a una época"
+    (click)="toggleMenu($event)"
+  >
+    <div class="stamp-tape" aria-hidden="true"></div>
+    <span class="stamp-icon" aria-hidden="true">
+      @if (activeIcon(); as icon) {
+        <app-era-icon [icon]="icon" />
+      }
+    </span>
+  </button>
+
+  <nav class="stamp-menu" aria-label="Ir a una época">
+    @for (era of tracker.iconEras(); track era.id) {
+      <button
+        type="button"
+        class="stamp-menu-item"
+        [class.active]="era.id === tracker.activeId()"
+        [style.background]="era.accent"
+        (click)="goTo(era.id, $event)"
+      >
+        <app-era-icon [icon]="era.icon!" />
+        <span class="stamp-menu-tip"><b>{{ era.label }}</b>{{ era.range }}</span>
+      </button>
+    }
+  </nav>
+</div>

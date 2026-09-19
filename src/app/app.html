@@ -1,18 +1,13 @@
-<header class="navbar-fija">
-  <p>El Legado <em>del Guaviare</em></p>
+@if (!started()) {
+  <app-intro-gate (start)="onStart()" />
+}
 
-  <!--Aqui no se si era asi ya que son varios iconos que salen de uno-->
-  <div class="icono-circular animar">
-    <img src="assets/imagenes/.png" alt="icono libreta">
-  </div>
-</header>
+<div class="bg-layer" [style.background-color]="tracker.bgColor()"></div>
 
+@if (started()) {
+  <app-stamp-nav />
 
-<app-hero></app-hero>
-<app-seccion-hoy></app-seccion-hoy>
-<app-seccion-exodo></app-seccion-exodo>
-<app-seccion-flota></app-seccion-flota>
-<app-seccion-bonanza></app-seccion-bonanza>
-<app-seccion-infancia></app-seccion-infancia>
-<app-seccion-raices></app-seccion-raices>
-<app-seccion-footer></app-seccion-footer>
+  <main>
+    <app-era-journey />
+  </main>
+}

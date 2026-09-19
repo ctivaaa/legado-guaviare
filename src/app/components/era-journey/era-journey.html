@@ -1,0 +1,97 @@
+<!-- Filtro SVG del título de "la quemaron": borde de letras rugoso/desgastado
+     vía displacement map. Seguro ahora porque el título usa Anton (trazo
+     sólido, sin huecos de plantilla) — ver nota en .journey-text--flota h2. -->
+<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+  <filter id="tetrico-roughen" x="-20%" y="-20%" width="140%" height="140%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.05 0.14" numOctaves="2" seed="7" result="noise" />
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="3.2" xChannelSelector="R" yChannelSelector="G" />
+  </filter>
+</svg>
+
+<div class="journey-runway" appScrub #runway>
+  <div class="journey-stage" [class.journey-shake]="flotaHit()">
+    @for (era of eras; track era.id; let i = $index) {
+      <div
+        class="journey-layer"
+        [class.journey-layer--hero]="era.id === 'hero'"
+        [class.journey-layer--monedas]="era.id === 'monedas'"
+        [class.journey-layer--flota]="era.id === 'flota'"
+        [class.journey-layer--exodo]="era.id === 'exodo'"
+        [class.journey-layer--bonanza]="era.id === 'bonanza'"
+        [class.journey-layer--cierre]="era.id === 'cierre'"
+        [class.journey-no-fadeout]="i === eras.length - 1"
+        [style.--start]="windowStart(i)"
+        [style.--end]="windowEnd(i)"
+        [style.--fade]="fade"
+        [style.--accent]="era.accent"
+      >
+        @if (era.video) {
+          <video [src]="era.video" [poster]="era.image" [muted]="true" [appLazyPlay]="isNear(i)" loop playsinline></video>
+        } @else {
+          <img [ngSrc]="era.image" [alt]="era.tag" fill [priority]="i === 0" />
+        }
+        <div class="journey-wash" [style.background]="era.accent2"></div>
+
+        <div class="journey-dust" aria-hidden="true">
+          @for (l of dust; track l; let d = $index) {
+            <span [style.left.%]="l" [style.animation-delay.s]="d * 1.1" [style.animation-duration.s]="9 + d"></span>
+          }
+        </div>
+
+        @if (era.id === 'flota') {
+          <!-- Anidado dentro de la propia capa: hereda su opacidad de fundido,
+               así que se apaga con la escena en vez de quedarse encendido para
+               siempre (ver nota en era-journey.css). -->
+          <div class="journey-ash" aria-hidden="true">
+            <span style="left:8%; animation-duration:5.5s; animation-delay:0s; --driftA:30px;"></span>
+            <span style="left:22%; animation-duration:7s; animation-delay:1.2s; --driftA:-25px;"></span>
+            <span style="left:38%; animation-duration:6s; animation-delay:0.4s; --driftA:20px;"></span>
+            <span style="left:54%; animation-duration:8s; animation-delay:2s; --driftA:-35px;"></span>
+            <span style="left:68%; animation-duration:6.5s; animation-delay:0.8s; --driftA:15px;"></span>
+            <span style="left:80%; animation-duration:7.5s; animation-delay:1.6s; --driftA:-20px;"></span>
+            <span style="left:92%; animation-duration:9s; animation-delay:0.2s; --driftA:25px;"></span>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="journey-vignette"></div>
+    <div class="journey-grain"></div>
+
+    @for (era of eras; track era.id; let i = $index) {
+      <div
+        class="journey-text"
+        [class.journey-text--hero]="era.id === 'hero'"
+        [class.journey-text--flota]="era.id === 'flota'"
+        [class.journey-no-fadeout]="i === eras.length - 1"
+        [style.--start]="windowStart(i)"
+        [style.--end]="windowEnd(i)"
+        [style.--fade]="fade"
+        [style.--accent]="era.accent"
+      >
+        @if (era.tag) {
+          <span class="journey-tag">{{ era.tag }}</span>
+        }
+        <div class="journey-title-tilt" [class.journey-title-tilt--flota]="era.id === 'flota'">
+          <h2 [class.journey-impact]="era.id === 'flota' && flotaHit()">{{ era.title }}</h2>
+        </div>
+        @if (era.quote) {
+          <blockquote class="journey-quote">
+            "{{ era.quote }}"
+            @if (era.credit) {
+              <cite>— {{ era.credit }}</cite>
+            }
+          </blockquote>
+        }
+      </div>
+    }
+
+    <div class="journey-index">
+      @for (era of eras; track era.id; let i = $index) {
+        @if (era.icon) {
+          <span class="journey-dot" [style.--start]="windowStart(i)" [style.--end]="windowEnd(i)" [style.--fade]="fade"></span>
+        }
+      }
+    </div>
+  </div>
+</div>

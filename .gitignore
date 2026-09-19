@@ -42,3 +42,8 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Videos originales sin comprimir (4K, decenas/cientos de MB) y assets viejos
+# ya reemplazados — se guardan localmente por si hacen falta, pero no van al
+# repo (varios superan el límite de 100MB de GitHub).
+/_originales_video_sin_comprimir/

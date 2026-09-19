@@ -1,26 +1,28 @@
-import {Component} from '@angular/core';
-import {Hero} from './components/hero/hero';
-import {SeccionHoy} from './components/seccion-hoy/seccion-hoy';
-import {SeccionBonanza} from './components/seccion-bonanza/seccion-bonanza';
-import {SeccionExodo} from './components/seccion-exodo/seccion-exodo';
-import {SeccionFlota} from './components/seccion-flota/seccion-flota';
-import {SeccionInfancia} from './components/seccion-infancia/seccion-infancia';
-import {SeccionRaices} from './components/seccion-raices/seccion-raices';
-import {SeccionFooter} from './components/seccion-footer/seccion-footer';
+import { Component, effect, inject, signal } from '@angular/core';
+import { StampNav } from './components/stamp-nav/stamp-nav';
+import { EraJourney } from './components/era-journey/era-journey';
+import { IntroGate } from './components/intro-gate/intro-gate';
+import { EraTracker } from './services/era-tracker';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports:[Hero,
-    SeccionHoy,
-    SeccionBonanza,
-    SeccionExodo,
-    SeccionFlota,
-    SeccionInfancia,
-    SeccionRaices,
-    SeccionFooter
-  ],
-  templateUrl:'./app.html',
-  styleUrl:'./app.css'
+  imports: [StampNav, EraJourney, IntroGate],
+  templateUrl: './app.html',
+  styleUrl: './app.css',
 })
-export class App {}
+export class App {
+  protected readonly tracker = inject(EraTracker);
+
+  protected readonly started = signal(false);
+
+  constructor() {
+    effect(() => {
+      if (typeof document === 'undefined') return;
+      document.body.style.overflow = this.started() ? '' : 'hidden';
+    });
+  }
+
+  onStart(): void {
+    this.started.set(true);
+  }
+}
