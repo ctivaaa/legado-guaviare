@@ -32,12 +32,13 @@
       >
         @if (era.video) {
           <video
-            [src]="era.video"
-            [attr.poster]="active() ? era.image : null"
+            [src]="videoSrc(era)"
+            [attr.poster]="active() ? posterSrc(era) : null"
+            [style.background-image]="placeholder(era)"
             aria-hidden="true"
             [muted]="true"
-            [appLazyPlay]="active() && isNear(i)"
-            [preload]="active() && isPreload(i) ? 'auto' : 'none'"
+            [appLazyPlay]="active() && !lowData() && isNear(i)"
+            [preload]="active() && !lowData() && isPreload(i) ? 'auto' : 'none'"
             loop
             playsinline
           ></video>

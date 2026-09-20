@@ -1,4 +1,4 @@
-<video class="intro-bg" src="assets/videoDinero.mp4" poster="assets/mascara-fajos.webp" [muted]="true" autoplay loop playsinline aria-hidden="true"></video>
+<video class="intro-bg" [attr.src]="videoSrc()" [attr.poster]="posterSrc()" [muted]="true" autoplay loop playsinline aria-hidden="true"></video>
 <div class="intro-overlay" aria-hidden="true"></div>
 <div class="intro-grain" aria-hidden="true"></div>
 <div class="intro-inner">

@@ -1,10 +1,11 @@
-import { Component, ElementRef, afterNextRender, computed, effect, inject, input, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, afterNextRender, computed, effect, inject, input, signal, viewChild } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { ScrollScrub } from '../../directives/scroll-scrub';
 import { LazyPlay } from '../../directives/lazy-play';
 import { EraTracker } from '../../services/era-tracker';
 import { Closing } from '../closing/closing';
 import { JOURNEY_FADE, JOURNEY_LAYERS, JourneyEra, chapterProgress } from '../../data/journey';
+import { PLACEHOLDERS } from '../../data/placeholders';
 
 const FADE = JOURNEY_FADE;
 
@@ -40,6 +41,11 @@ export class EraJourney {
   private readonly runwayRef = viewChild.required<ElementRef<HTMLElement>>('runway');
   private readonly tracker = inject(EraTracker);
 
+  /** Pantalla de celular: se usan los videos y pósters ligeros, recortados en vertical (assets/m/). */
+  protected readonly mobile = signal(false);
+  /** Ahorro de datos o conexión 2G: no se descargan ni reproducen videos, solo el póster. */
+  protected readonly lowData = signal(false);
+
   /** True desde que empieza a fundirse el cierre — antes de eso está inerte. */
   protected readonly closingActive = computed(
     () => this.scrub().progress() >= this.windowStart(this.closingIndex) - this.fade,
@@ -49,8 +55,19 @@ export class EraJourney {
   protected readonly flotaHit = signal(false);
 
   constructor() {
+    const destroyRef = inject(DestroyRef);
+
     afterNextRender(() => {
       this.tracker.registerJourney(this.runwayRef().nativeElement, this.eras);
+
+      const mql = matchMedia('(max-width: 640px)');
+      this.mobile.set(mql.matches);
+      const onChange = (e: MediaQueryListEvent) => this.mobile.set(e.matches);
+      mql.addEventListener('change', onChange);
+      destroyRef.onDestroy(() => mql.removeEventListener('change', onChange));
+
+      const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+      this.lowData.set(!!conn?.saveData || ['slow-2g', '2g'].includes(conn?.effectiveType ?? ''));
     });
 
     effect(() => {
@@ -103,6 +120,25 @@ export class EraJourney {
 
   protected windowEnd(i: number): number {
     return (i + 1) / this.eras.length;
+  }
+
+  /** Ruta del archivo según el dispositivo: en celular, la versión ligera de assets/m/. */
+  private mediaPath(path: string): string {
+    return this.mobile() ? path.replace('assets/', 'assets/m/') : path;
+  }
+
+  protected videoSrc(era: JourneyEra): string | null {
+    return era.video ? this.mediaPath(era.video) : null;
+  }
+
+  protected posterSrc(era: JourneyEra): string {
+    return this.mediaPath(era.image);
+  }
+
+  /** Miniatura incrustada (se ve al instante) que rellena el fondo hasta que llegue el póster. */
+  protected placeholder(era: JourneyEra): string | null {
+    const ph = PLACEHOLDERS[era.image];
+    return ph ? `url(${this.mobile() ? ph.v : ph.h})` : null;
   }
 
   /** Dónde (0→1) queda en reposo el capítulo `i`: ancla del scroll táctil. */
