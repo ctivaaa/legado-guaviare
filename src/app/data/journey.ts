@@ -21,6 +21,16 @@ export interface JourneyEra {
 export const JOURNEY_FADE = 0.035;
 
 /**
+ * Progreso (0→1) del scroll en el que el capítulo `i` de `n` queda "en reposo":
+ * ya terminó de fundirse y su texto se ve completo. Lo comparten el teclado, el
+ * panel de épocas y los puntos de anclaje del scroll táctil, para que todos
+ * caigan exactamente en el mismo sitio. El prólogo es el tope de la página.
+ */
+export function chapterProgress(i: number, n: number): number {
+  return i === 0 ? 0 : Math.min(i / n + JOURNEY_FADE + 0.02, 1);
+}
+
+/**
  * El hero ya no es una escena aparte: es la primera ventana de la misma
  * escena continua, para que no haya costura entre "entrar al sitio" y
  * "empezar la historia".

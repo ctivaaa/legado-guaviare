@@ -9,6 +9,10 @@
 </svg>
 
 <div class="journey-runway" appScrub #runway>
+  <!-- Puntos de anclaje del scroll táctil (ver .journey-snap): un capítulo por deslizada. -->
+  @for (era of eras; track era.id; let i = $index) {
+    <span class="journey-snap" aria-hidden="true" [style.--t]="snapAt(i)"></span>
+  }
   <div class="journey-stage" [class.journey-shake]="flotaHit()">
     @for (era of eras; track era.id; let i = $index) {
       <div
@@ -19,6 +23,7 @@
         [class.journey-layer--exodo]="era.id === 'exodo'"
         [class.journey-layer--bonanza]="era.id === 'bonanza'"
         [class.journey-layer--cierre]="era.id === 'cierre'"
+        [class.journey-layer--far]="!isNear(i)"
         [class.journey-no-fadeout]="i === eras.length - 1"
         [style.--start]="windowStart(i)"
         [style.--end]="windowEnd(i)"
@@ -32,7 +37,7 @@
             aria-hidden="true"
             [muted]="true"
             [appLazyPlay]="active() && isNear(i)"
-            [preload]="active() && isNear(i) ? 'auto' : 'none'"
+            [preload]="active() && isPreload(i) ? 'auto' : 'none'"
             loop
             playsinline
           ></video>

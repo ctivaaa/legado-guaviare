@@ -118,9 +118,13 @@
   .control-item.checked { animation: none; }
 }
 
+/* En celular los textos se quedan (sin ellos los círculos no dicen para qué
+   sirven) y la pantalla completa se quita: no aporta en el móvil y iOS ni la
+   soporta. Área táctil de 44px de alto. */
 @media (max-width: 640px) {
-  .control-bar { left: 16px; bottom: 16px; gap: 12px; }
-  .control-label { display: none; }
+  .control-bar { left: 16px; bottom: 8px; gap: 12px; }
+  .control-item { min-height: 44px; font-size: 12px; }
+  .control-item--fullscreen { display: none; }
 }
 
 /* ---------- Panel de épocas desplegable: cerrado es solo el contador y un

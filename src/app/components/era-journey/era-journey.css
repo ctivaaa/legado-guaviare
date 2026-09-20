@@ -246,6 +246,26 @@
   .journey-stage { position: static; height: 100vh; }
 }
 
+/* Las capas lejanas (fuera de la ventana de la escena actual) no se pintan:
+   en celular son 7 videos a pantalla completa con filtros y mezclas de color,
+   y con opacity:0 seguían ocupando memoria de GPU. */
+.journey-layer--far { visibility: hidden; }
+
+/* Anclas del scroll táctil: cada una marca dónde queda en reposo un capítulo
+   (misma posición que usan el teclado y el panel). Solo cuentan en pantallas
+   táctiles/chicas; en escritorio se ocultan y el scroll sigue siendo continuo. */
+.journey-snap { display: none; }
+@media (pointer: coarse), (max-width: 640px) {
+  .journey-snap {
+    display: block; position: absolute; left: 0; width: 1px; height: 1px; pointer-events: none;
+    top: calc((100% - 100vh) * var(--t, 0));
+    scroll-snap-align: start; scroll-snap-stop: always;
+  }
+  .journey-grain { display: none; }
+}
+
 @media (max-width: 640px) {
+  /* Largo corto a propósito: con el snap ya no hay riesgo de cruzar varios
+     capítulos de un deslizón, y así basta un arrastre corto para pasar al siguiente. */
   .journey-runway { height: 525vh; }
 }

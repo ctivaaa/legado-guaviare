@@ -1,6 +1,8 @@
 import { DestroyRef, Injectable, afterNextRender, inject, signal } from '@angular/core';
 
 const SPEED_PX_PER_FRAME = 1.6;
+/** Ventana en la que un clic se considera parte del toque que acaba de pausar. */
+const GESTURE_CLICK_MS = 600;
 const SCROLL_KEYS = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ']);
 
 /**
@@ -17,6 +19,10 @@ export class AutoScroll {
     const destroyRef = inject(DestroyRef);
     afterNextRender(() => {
       const pause = () => {
+        // Un toque en el propio botón dispara touchstart (que pausa) y luego el
+        // clic (toggle): sin este sello el clic lo volvía a encender y en celular
+        // no había forma de detenerlo tocando el botón.
+        if (this.active()) this.pausedByGestureAt = performance.now();
         this.active.set(false);
         this.restoreScrollBehavior?.();
       };
@@ -38,7 +44,12 @@ export class AutoScroll {
   /** Restaura el scroll-behavior global de <html> al cortar el avance (por toggle, fin de página o destroy). */
   private restoreScrollBehavior: (() => void) | null = null;
 
+  /** Cuándo un gesto del usuario (rueda, toque, tecla) apagó el avance por última vez. */
+  private pausedByGestureAt = -Infinity;
+
   toggle(): void {
+    // El clic que sigue a un toque que acaba de pausar es ese mismo toque: ignorarlo.
+    if (!this.active() && performance.now() - this.pausedByGestureAt < GESTURE_CLICK_MS) return;
     this.active.update((v) => !v);
     if (this.active()) this.loop();
     else this.restoreScrollBehavior?.();
@@ -51,9 +62,13 @@ export class AutoScroll {
     // forzamos a "auto" mientras dura el avance automático.
     const root = document.documentElement;
     const prevBehavior = root.style.scrollBehavior;
+    const prevSnap = root.style.scrollSnapType;
     root.style.scrollBehavior = 'auto';
+    // Igual con el snap del scroll táctil: cada scrollBy de 1.6px lo devolvería al ancla.
+    root.style.scrollSnapType = 'none';
     this.restoreScrollBehavior = () => {
       root.style.scrollBehavior = prevBehavior;
+      root.style.scrollSnapType = prevSnap;
       this.restoreScrollBehavior = null;
     };
 

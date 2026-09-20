@@ -4,7 +4,7 @@ import { ScrollScrub } from '../../directives/scroll-scrub';
 import { LazyPlay } from '../../directives/lazy-play';
 import { EraTracker } from '../../services/era-tracker';
 import { Closing } from '../closing/closing';
-import { JOURNEY_FADE, JOURNEY_LAYERS, JourneyEra } from '../../data/journey';
+import { JOURNEY_FADE, JOURNEY_LAYERS, JourneyEra, chapterProgress } from '../../data/journey';
 
 const FADE = JOURNEY_FADE;
 
@@ -103,6 +103,18 @@ export class EraJourney {
 
   protected windowEnd(i: number): number {
     return (i + 1) / this.eras.length;
+  }
+
+  /** Dónde (0→1) queda en reposo el capítulo `i`: ancla del scroll táctil. */
+  protected snapAt(i: number): number {
+    return chapterProgress(i, this.eras.length);
+  }
+
+  /** Empieza a descargar el video del capítulo siguiente antes de que se vea, para
+   * que al llegar a él ya esté listo y no se quede el póster esperando en celular. */
+  protected isPreload(i: number): boolean {
+    const p = this.scrub().progress();
+    return p >= this.windowStart(i) - 1 / this.eras.length - this.fade && p <= this.windowEnd(i) + this.fade;
   }
 
   /** Solo esta época (o la que se está cruzando con ella en el fundido) debe

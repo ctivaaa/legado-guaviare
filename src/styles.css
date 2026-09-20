@@ -17,6 +17,13 @@ html {
   -ms-overflow-style: none;
 }
 
+/* Scroll táctil por capítulos: cada deslizada termina en el siguiente ancla
+   (.journey-snap en era-journey) en vez de cruzar varios capítulos de golpe. */
+@media (pointer: coarse), (max-width: 640px) {
+  html { scroll-snap-type: y mandatory; }
+  body::after { display: none; }
+}
+
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
   display: none;

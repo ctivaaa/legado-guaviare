@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { JOURNEY_FADE, JourneyEra } from '../data/journey';
+import { JourneyEra, chapterProgress } from '../data/journey';
 
 /** Cuánto se recuerda el destino de una pulsación mientras dura el scroll suave. */
 const PENDING_MS = 900;
@@ -90,8 +90,7 @@ export class EraTracker {
     const runway = this.runway();
     if (!runway || i < 0 || i >= this.layersList.length) return;
     const total = runway.offsetHeight - window.innerHeight;
-    // El prólogo es el comienzo de la página: arriba del todo, no "un poco adentro".
-    const targetP = i === 0 ? 0 : Math.min(i / this.layersList.length + JOURNEY_FADE + 0.02, 1);
+    const targetP = chapterProgress(i, this.layersList.length);
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({
       top: runway.offsetTop + targetP * total,
