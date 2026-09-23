@@ -8,13 +8,19 @@
     @for (c of credits; track c.role) {
       <li>{{ c.role }} — <span class="closing__name">{{ c.by }}</span></li>
     }
-    <li>Un proyecto de <a class="closing__link" href="https://www.instagram.com/kawede" target="_blank" rel="me noopener">&#64;kawede</a> — Guaviare, Colombia</li>
+    <li>Un proyecto de <a class="closing__link" href="https://www.instagram.com/kawedecol/" target="_blank" rel="me noopener" (click)="click()">&#64;kawede</a> — Guaviare, Colombia</li>
   </ul>
+
+  <a class="closing__portfolio" href="https://www.behance.net/gallery/221316011/Portafolio" target="_blank" rel="noopener" (click)="click()">
+    
+    Portafolio
+  </a>
 
   <div class="closing__actions">
     <button type="button" class="btn btn--primary" (click)="restart()">Volver a ver desde el inicio</button>
     <button type="button" class="btn btn--ghost" (click)="share()">
       <span aria-live="polite">{{ copied() ? 'Enlace copiado' : 'Compartir este proyecto' }}</span>
     </button>
+    <a class="btn btn--ghost" href="mailto:andresf.buitragov@gmail.com" (click)="click()">Trabajemos</a>
   </div>
 </div>

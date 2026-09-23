@@ -52,11 +52,13 @@ export class StampNav {
 
   toggleAudio(event: Event): void {
     event.stopPropagation();
+    this.ambientAudio.playClick();
     this.ambientAudio.toggleMute();
   }
 
   toggleAutoScroll(event: Event): void {
     event.stopPropagation();
+    this.ambientAudio.playClick();
     this.autoScroll.toggle();
   }
 
@@ -66,6 +68,7 @@ export class StampNav {
 
   toggleFullscreen(event: Event): void {
     event.stopPropagation();
+    this.ambientAudio.playClick();
     if (document.fullscreenElement) {
       document.exitFullscreen();
     } else {
@@ -75,6 +78,7 @@ export class StampNav {
 
   toggleMenu(event: Event): void {
     event.stopPropagation();
+    this.ambientAudio.playClick();
     this.menuOpenSignal.update((v) => !v);
   }
 
@@ -84,6 +88,7 @@ export class StampNav {
 
   goTo(id: string, event: Event): void {
     event.stopPropagation();
+    this.ambientAudio.playClick();
     this.tracker.scrollTo(id);
     this.menuOpenSignal.set(false);
   }

@@ -1,5 +1,6 @@
 import { Component, DestroyRef, inject, input, signal } from '@angular/core';
 import { JourneyEra } from '../../data/journey';
+import { AmbientAudio } from '../../services/ambient-audio';
 
 const COPIED_MS = 2200;
 
@@ -27,16 +28,25 @@ export class Closing {
   protected readonly copied = signal(false);
   private copiedTimer = 0;
 
+  private readonly audio = inject(AmbientAudio);
+
   constructor() {
     inject(DestroyRef).onDestroy(() => clearTimeout(this.copiedTimer));
   }
 
+  /** Mismo clic sintetizado que "Empezar", para los enlaces de esta pantalla (portafolio, contacto). */
+  protected click(): void {
+    this.audio.playClick();
+  }
+
   protected restart(): void {
+    this.audio.playClick();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   /** Comparte con el diálogo nativo si existe; si no, copia el enlace. */
   protected async share(): Promise<void> {
+    this.audio.playClick();
     const url = location.href;
     try {
       if (navigator.share) {

@@ -45,12 +45,22 @@
 .closing__link:hover { color: var(--accent, #cf9a52); border-color: currentColor; }
 .closing__link:focus-visible { outline: 2px solid #f7f1e6; outline-offset: 3px; border-radius: 2px; }
 
+.closing__portfolio {
+  display: inline-flex; align-items: center; gap: 0.5rem; pointer-events: auto; text-decoration: none;
+  font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: #9c9384;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3); transition: color 0.2s ease, border-color 0.2s ease;
+}
+.closing__portfolio svg { width: 14px; height: 14px; fill: currentColor; }
+.closing__portfolio:hover { color: var(--accent, #cf9a52); border-color: currentColor; }
+.closing__portfolio:focus-visible { outline: 2px solid #f7f1e6; outline-offset: 3px; border-radius: 2px; }
+
 .closing__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 0.75rem; }
 
 .btn {
   font-family: 'Literata', serif; font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase;
   padding: 0.9rem 1.7rem; border-radius: 999px; cursor: pointer; pointer-events: auto;
   transition: transform 0.2s ease, filter 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  text-decoration: none; display: inline-flex; align-items: center;
 }
 .btn:hover { transform: translateY(-2px); }
 .btn:focus-visible { outline: 2px solid #f7f1e6; outline-offset: 3px; }
@@ -73,4 +83,30 @@
       rgba(4, 3, 2, 0.8) 0%, rgba(4, 3, 2, 0.68) 60%, rgba(4, 3, 2, 0.4) 85%, transparent 100%
     );
   }
+}
+
+/* Móvil: la escena mide justo 100vh y no hace scroll (ver .journey-stage), así
+   que si este bloque crece de más pisa la marca/el contador fijos de arriba.
+   Todo se aprieta para caber siempre por debajo de esa cabecera. */
+@media (max-width: 640px) {
+  :host { padding: 0 1.25rem 4rem; }
+  .closing__inner { gap: 0.55rem; max-width: 26rem; }
+  .closing__kicker { font-size: 1.05rem; }
+  .closing__title { font-size: clamp(1.4rem, 7vw, 1.9rem); }
+  .closing__text { font-size: 0.88rem; line-height: 1.45; }
+  .closing__divider { margin: 0.15rem 0; }
+  .closing__credits { font-size: 0.62rem; line-height: 1.6; }
+  .closing__portfolio { font-size: 0.64rem; }
+  .closing__actions { gap: 0.5rem; margin-top: 0.35rem; }
+  .btn { padding: 0.65rem 1.3rem; font-size: 0.68rem; }
+}
+
+/* Pantallas bajas (celulares chicos o con barra de navegador visible): un
+   segundo apretón, priorizando que nada quede tapado por la cabecera fija. */
+@media (max-height: 700px) {
+  :host { padding-bottom: 2.5rem; }
+  .closing__inner { gap: 0.4rem; }
+  .closing__text { display: none; }
+  .closing__divider { display: none; }
+  .closing__actions { margin-top: 0.2rem; }
 }
